@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/spf13/cast"
@@ -15,6 +16,8 @@ const (
 	TestMode = "test"
 	// ReleaseMode indicates service mode is release.
 	ReleaseMode = "release"
+
+	TimeExpiredAt = time.Hour * 24
 )
 
 type Config struct {

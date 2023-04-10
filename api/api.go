@@ -29,6 +29,11 @@ func NewApi(r *gin.Engine, cfg *config.Config, store storage.StorageI, logger lo
 	r.POST("/login", nil)
 	r.POST("/register", nil)
 
+	// user api
+	r.POST("/user", handler.CreateUser)
+	r.GET("/user/:id", handler.GetByIdUser)
+	r.GET("/user", handler.GetListUser)
+
 	// // category api
 	// r.POST("/category", handler.CreateCategory)
 	// r.GET("/category/:id", handler.GetByIdCategory)
@@ -113,10 +118,6 @@ func NewApi(r *gin.Engine, cfg *config.Config, store storage.StorageI, logger lo
 	r.POST("/order_item/", handler.CreateOrderItem)
 	r.DELETE("/order_item/:id", handler.DeleteOrderItem)
 
-	// user api
-	r.POST("/user", handler.CreateUser)
-	r.GET("/user/:id", handler.GetByIdUser)
-	r.GET("/user", handler.GetListUser)
 
 	url := ginSwagger.URL("swagger/doc.json") // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))

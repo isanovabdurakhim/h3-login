@@ -1,23 +1,17 @@
 package models
 
 type Register struct {
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	Login       string `json:"login"`
-	Password    string `json:"password"`
-	PhoneNumber string `json:"phone_number"`
-	UserType    string `json:"user_type"`
+	Name     string `json:"name"`
+	Login    string `json:"login"`
+	Password string `json:"password"`
 }
 
 type Login struct {
 	Login    string `json:"login"`
-	Register string `json:"register"`
+	Password string `json:"password"`
 }
 
 type LoginResponse struct {
-	AccessToken string `json:"access_token"`
-}
-
-type PasswordResponse struct {
-	AccessToken string `json:"access_token"`
+	UserData *User  `json:"user_data"`
+	Token    string `json:"token"`
 }

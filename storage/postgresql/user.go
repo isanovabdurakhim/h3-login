@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"app/api/models"
-	"app/pkg/helper"
 	"context"
 	"fmt"
 
@@ -23,30 +22,29 @@ func NewUserRepo(db *pgxpool.Pool) *userRepo {
 func (r *userRepo) Create(ctx context.Context, req *models.Register) (string, error) {
 	var (
 		query string
+		id    string
 	)
-	id := uuid.New().String()
+	id = uuid.NewString()
 
 	query = `
 		INSERT INTO users(
-			user_id, 
-			first_name,
-			last_name,
+			id, 
+			name,
 			login,
 			password,
-			phone_number,
-			updated_at
+			updated_at 
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, now()) RETURNING user_id
+		VALUES ( $1, $2, $3, $4, now())
 	`
-	err := r.db.QueryRow(ctx, query,
+	_, err := r.db.Exec(ctx, query,
 		id,
-		req.FirstName,
-		req.LastName,
+		req.Name,
 		req.Login,
 		req.Password,
-		helper.NewNullString(req.PhoneNumber),
-	).Scan(&id)
+	)
 	if err != nil {
+		fmt.Println(err.Error())
+
 		return "", err
 	}
 
@@ -60,27 +58,30 @@ func (r *userRepo) GetByID(ctx context.Context, req *models.UserPKey) (*models.U
 		user  models.User
 	)
 
+	if len(req.Login) > 0 {
+		err := r.db.QueryRow(ctx, "SELECT id FROM users WHERE login = $1", req.Login).Scan(&req.UserId)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	query = `
 		SELECT
-			user_id, 
-			first_name,
-			last_name,
+			id, 
+			name,
 			login,
 			password,
-			COALESCE(phone_number, ''),
-			TO_CHAR(created_at, 'YYYY-MM-DD HH24-MI-SS'),
-            TO_CHAR(updated_at, 'YYYY-MM-DD HH24-MI-SS')
+			CAST(created_at::timestamp AS VARCHAR),
+			CAST(updated_at::timestamp AS VARCHAR)
 		FROM users
-		WHERE user_id = $1
+		WHERE id = $1
 	`
 
 	err := r.db.QueryRow(ctx, query, req.UserId).Scan(
-		&user.UserId,
-		&user.FirstName,
-		&user.LastName,
+		&user.Id,
+		&user.Name,
 		&user.Login,
 		&user.Password,
-		&user.PhoneNumber,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -104,15 +105,13 @@ func (r *userRepo) GetList(ctx context.Context, req *models.GetListUserRequest) 
 
 	query = `
 		SELECT
-	    	COUNT(*) OVER(),
-			user_id, 
-			first_name,
-			last_name,
+			COUNT(*) OVER(),
+			id, 
+			name,
 			login,
 			password,
-			COALESCE(phone_number, ''),
-			TO_CHAR(created_at, 'YYYY-MM-DD HH24-MI-SS'),
-			TO_CHAR(updated_at, 'YYYY-MM-DD HH24-MI-SS')
+			CAST(created_at::timestamp AS VARCHAR),
+			CAST(updated_at::timestamp AS VARCHAR)
 		FROM users
 	`
 
@@ -140,12 +139,10 @@ func (r *userRepo) GetList(ctx context.Context, req *models.GetListUserRequest) 
 		var user models.User
 		err = rows.Scan(
 			&resp.Count,
-			&user.UserId,
-			&user.FirstName,
-			&user.LastName,
+			&user.Id,
+			&user.Name,
 			&user.Login,
 			&user.Password,
-			&user.PhoneNumber,
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		)

@@ -145,19 +145,6 @@ definitions:
       zip_code:
         type: string
     type: object
-  models.CreateUser:
-    properties:
-      first_name:
-        type: string
-      last_name:
-        type: string
-      login:
-        type: string
-      password:
-        type: string
-      phone_number:
-        type: string
-    type: object
   models.CustomerPrimaryKey:
     properties:
       customer_id:
@@ -173,6 +160,13 @@ definitions:
         type: integer
       to_store_id:
         type: integer
+    type: object
+  models.Login:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
     type: object
   models.OrderItemPrimaryKey:
     properties:
@@ -202,6 +196,15 @@ definitions:
   models.PromoCodePrimaryKey:
     properties:
       name:
+        type: string
+    type: object
+  models.Register:
+    properties:
+      login:
+        type: string
+      name:
+        type: string
+      password:
         type: string
     type: object
   models.StaffPrimaryKey:
@@ -1114,6 +1117,52 @@ paths:
       summary: Update Customer
       tags:
       - Customer
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Create Login
+      operationId: login
+      parameters:
+      - description: LoginRequest
+        in: body
+        name: logim
+        required: true
+        schema:
+          $ref: '#/definitions/models.Login'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create Login
+      tags:
+      - Login
   /order:
     get:
       consumes:
@@ -1944,6 +1993,52 @@ paths:
       summary: Get By ID PromoCode
       tags:
       - PromoCode
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create Register
+      operationId: register
+      parameters:
+      - description: CreateRegisterRequest
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/models.Register'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Create Register
+      tags:
+      - Register
   /report/exchange:
     put:
       consumes:
@@ -2962,12 +3057,12 @@ paths:
       description: Create User
       operationId: create_user
       parameters:
-      - description: CreateUserRequest
+      - description: RegisterRequest
         in: body
-        name: user
+        name: register
         required: true
         schema:
-          $ref: '#/definitions/models.CreateUser'
+          $ref: '#/definitions/models.Register'
       produces:
       - application/json
       responses:
