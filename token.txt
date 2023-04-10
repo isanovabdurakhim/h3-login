@@ -1,0 +1,18 @@
+
+
+
+REQUEST -->
+            /user   PUBLIC
+            /book   PUBLIC
+            /order  PRIVATE
+
+<----RESPONSE
+
+Token
+KEY
+
+
+
+
+
+
